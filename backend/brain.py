@@ -26,9 +26,8 @@ class KlaraBrain:
         else:
             self.openrouter_client = None
 
-    def generate_text(self, prompt, history=None, model="groq"):
+    def generate_text(self, prompt, history=None, model="groq", max_tokens=1000, **kwargs):
         """Genera texto usando el modelo seleccionado manteniendo el historial."""
-        # Si history ya trae la estructura completa de mensajes (SYSTEM_PROMPT + historial + prompt), la usamos
         if history:
             messages = history
         else:
@@ -42,7 +41,7 @@ class KlaraBrain:
                 model="llama-3.3-70b-versatile",
                 messages=messages,
                 temperature=0.7,
-                max_tokens=4096,
+                max_tokens=max_tokens,
             )
             return response.choices[0].message.content
 
@@ -54,6 +53,7 @@ class KlaraBrain:
                 model="mistralai/mistral-large",
                 messages=messages,
                 temperature=0.7,
+                max_tokens=max_tokens,  # Limita el consumo para evitar error 402 en OpenRouter
             )
             return response.choices[0].message.content
 
@@ -61,7 +61,10 @@ class KlaraBrain:
             if not self.gemini:
                 raise ValueError("GEMINI_API_KEY no está configurada.")
             
-            response = self.gemini.generate_content(prompt)
+            response = self.gemini.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(max_output_tokens=max_tokens)
+            )
             return response.text
 
         else:
