@@ -58,12 +58,12 @@ def generate_response(chat_id, user_text):
         messages.append(msg)
     messages.append({"role": "user", "content": user_text})
     
-    # Usar Groq como motor principal y fallback a OpenRouter si falla (limitando max_tokens a 1000)
+    # Usar Groq como motor principal y fallback a OpenRouter si falla
     try:
-        response = brain.generate_text(user_text, history=messages, model="groq", max_tokens=1000)
+        response = brain.generate_text(user_text, history=messages, model="groq")
     except Exception as e:
         try:
-            response = brain.generate_text(user_text, history=messages, model="openrouter", max_tokens=1000)
+            response = brain.generate_text(user_text, history=messages, model="openrouter")
         except Exception as inner_e:
             response = f"Lo siento, Alejandro, mis motores de IA fallaron: {inner_e}"
     
